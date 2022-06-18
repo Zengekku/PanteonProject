@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Transform[] runners;
     [SerializeField] Transform startPos;
+    [SerializeField] GameObject drawWall;
+    List<Transform> ranks = new List<Transform>();
     public Vector3 StartPos { get { return startPos.position; } }
     WaitForSeconds gap;
 
@@ -22,13 +25,22 @@ public class GameManager : MonoBehaviour
         while (gameObject.activeSelf)
         {
             if (runners.Length == 0) yield break;
-            runners = runners.OrderByDescending(t => t.transform.position.z).ToArray();
+            OrderUnitRanks();
             yield return gap;
         }
     }
-
-    public void PassedFinishLine()
+    public void ActivateDrawWall()
     {
-        Debug.Log("Player win");
+        drawWall.SetActive(true);
+        foreach (var runner in runners)
+        {
+            runner.GetComponent<IRunner>().StopMoving();
+        }
     }
+
+    public void PassedFinishLine(Transform runner)
+    {
+        ranks.Add(runner);
+    }
+    void OrderUnitRanks() => runners = runners.OrderByDescending(t => t.transform.position.z).ToArray();
 }

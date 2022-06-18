@@ -7,84 +7,80 @@ public class EnemyAI : Unit, IRunner
     [SerializeField] float rayMaxDistance = 1f;
     [SerializeField] LayerMask layerMask;
     [SerializeField] MeshRenderer ground;
-    bool raycasting;
 
     private void Start()
     {
-        //maxForwardSpeed = Random.Range(maxForwardSpeed * 0.5f, maxForwardSpeed);
-        maxForwardSpeed = 300;
-        maxHorizontalSpeed = 400;
+        //if you want different AI
+        /*maxForwardSpeed = Random.Range(maxForwardSpeed -100, maxForwardSpeed);
+        maxHorizontalSpeed = maxForwardSpeed;*/
     }
     void Update()
     {
-        if (stopped) return;
+        if (unitStopped) return;
         float distPerRay = rayAngle / rayCount;
-        float forceDir = 0;
+        float desiredDirection = 0;
         int hitCount = 0;
         for (int i = 0; i <= rayCount; i++)
         {
-            float angle = transform.eulerAngles.y - rayAngle * 0.5f + distPerRay * i;
-            var dir = Vector3.forward + DirFromAngle(angle);
+            Vector3 dir = GetDirection(distPerRay, i);
+
+#if UNITY_EDITOR
             Debug.DrawRay(transform.position + Vector3.up, dir * rayMaxDistance, Color.red);
+#endif
 
-
-            if (Physics.Raycast(transform.position + Vector3.up, dir, out var hit, rayMaxDistance, layerMask))
+            RaycastHit hit;
+            if (CheckObstacles(dir, out hit))
             {
                 hitCount++;
-                forceDir += -hit.transform.position.x;
-
+                desiredDirection += -hit.transform.position.x;
             }
         }
-
-        if (hitCount == 0)
+        if (hitCount == 0)//if no obstacles found align to middle
         {
-            if (transform.position.x < -2f || transform.position.x > 2f)
+            if (transform.position.x < -2 || transform.position.x > 2)
             {
-                forceDir = -transform.position.x;
-
+                desiredDirection = -transform.position.x;
             }
             else
             {
-                forceDir = 0;
+                desiredDirection = 0;
                 force.x = 0;
             }
-
         }
-        else if (forceDir == 0)
-            forceDir = 1;
+        else if (desiredDirection == 0)//if no direction found go right
+            desiredDirection = 1;
 
-        force.x = Mathf.Clamp(forceDir * speed + force.x, -maxHorizontalSpeed, maxHorizontalSpeed);
+        SetDesiradeForce(desiredDirection);
         //if (transform.position.x > 4.2 && force.x > 0 || transform.position.x < -4.2f && force.x < 0)
         //force.x = -force.x; if you want border detection
-    }
-
-    Vector3 DirFromAngle(float angle, bool isGlobal = true)
-    {
-        if (!isGlobal)
-            angle += transform.eulerAngles.y;
-        return new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0, Mathf.Cos(angle * Mathf.Deg2Rad));
     }
     public void AddHorizontalForce(float _force) => force.x = Mathf.Clamp(force.x - _force, -maxHorizontalSpeed, maxHorizontalSpeed);
     public void AddVerticalForce(float _force) => force.y += _force;
     public void AddForwardForce(float _force) => force.z += _force;
     public void StopMoving()
     {
-        stopped = true;
+        unitStopped = true;
         rgb.velocity = Vector3.down * 25;
         force.z *= 0.5f;
         force.x = 0;
-        /*stopped = true;  
-        rgb.isKinematic = true;
-        rgb.velocity = Vector3.down * 25;
-        force.x = 0;
-        force.z = 0;*/
     }
-    public void ContinueMoving() => stopped = false;
+    public void ContinueMoving() => unitStopped = false;
     public void Push(Vector3 dir) => rgb.AddForce(dir, ForceMode.VelocityChange);
+    void SetDesiradeForce(float forceDir) => force.x = Mathf.Clamp(forceDir * speed + force.x, -maxHorizontalSpeed, maxHorizontalSpeed);
+    bool CheckObstacles(Vector3 dir, out RaycastHit hit) => Physics.Raycast(transform.position + Vector3.up, dir, out hit, rayMaxDistance, layerMask);
+    Vector3 GetDirection(float distPerRay, int i)
+    {
+        float angle = transform.eulerAngles.y - rayAngle * 0.5f + distPerRay * i;
+        var dir = Vector3.forward + DirFromAngle(angle);
+        return dir;
+    }
+    Vector3 DirFromAngle(float angle) => new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0, Mathf.Cos(angle * Mathf.Deg2Rad));
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Finish"))
         {
+            GameManager.instance.PassedFinishLine(transform);
             StopMoving();
             rgb.isKinematic = true;
             GetComponent<Collider>().enabled = false;

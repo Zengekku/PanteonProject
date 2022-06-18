@@ -21,7 +21,7 @@ public class RotatingPlatform : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            other.gameObject.GetComponent<IRunner>().ContinueMoving();
+            //other.gameObject.GetComponent<IRunner>().ContinueMoving();
         }
     }
 }
