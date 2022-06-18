@@ -84,6 +84,7 @@ public class EnemyAI : Unit, IRunner
             StopMoving();
             rgb.isKinematic = true;
             GetComponent<Collider>().enabled = false;
+            animator.Play("Cheer");
         }
     }
 }

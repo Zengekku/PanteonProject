@@ -866,11 +866,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rgb: {fileID: 6781821490284901985}
+  animator: {fileID: 6781821490284901984}
   speed: 100
-  maxHorizontalSpeed: 500
-  maxForwardSpeed: 400
+  maxHorizontalSpeed: 600
+  maxForwardSpeed: 450
   force: {x: 0, y: -200, z: 200}
-  rayCount: 8
+  rayCount: 10
   rayAngle: 270
   rayMaxDistance: 2.5
   layerMask:

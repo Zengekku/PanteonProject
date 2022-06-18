@@ -37,6 +37,7 @@ public class Player : Unit, IRunner
             GameManager.instance.ActivateDrawWall();
             StopMoving();
             PlayerToLastLocation();
+            animator.Play("Cheer");
         }
     }
     void PlayerToLastLocation()
