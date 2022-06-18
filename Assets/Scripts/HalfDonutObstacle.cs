@@ -9,9 +9,10 @@ public class HalfDonutObstacle : MonoBehaviour
     Transform caughtUnit;
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+
+        if (other.gameObject.TryGetComponent<IRunner>(out var unit))
         {
-            other.GetComponent<IRunner>().StopMoving();
+            unit.StopMoving();
             caughtUnit = other.transform;
             animator.SetTrigger("Catch");
         }

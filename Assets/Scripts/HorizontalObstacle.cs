@@ -6,7 +6,7 @@ public class HorizontalObstacle : Obstacle
 {
     [SerializeField] MeshRenderer groundMesh;
     [SerializeField] float horizontalSpeed = 1;
-    [SerializeField] float pushForce = 50f;
+
     float length;
     Vector3 startPos;
     float time;
@@ -31,7 +31,8 @@ public class HorizontalObstacle : Obstacle
         time += Time.deltaTime;
         transform.position = currentPos;
     }
-    /* void OnCollisionEnter(Collision other)  Push back mechanic
+    /* [SerializeField] float pushForce = 50f;
+      void OnCollisionEnter(Collision other)  Push back mechanic
 {
     if (other.gameObject.CompareTag("Player"))
     {

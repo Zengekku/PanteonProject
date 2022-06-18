@@ -7,15 +7,15 @@ public class Player : Unit, IRunner
     void Update()
     {
         if (unitStopped) return;
+        if (Input.GetButton("Horizontal"))
+        {
+            var x = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetKey(KeyCode.D))
-            force.x = Mathf.Clamp(force.x + speed, 0, maxHorizontalSpeed);
-        else if (Input.GetKey(KeyCode.A))
-            force.x = Mathf.Clamp(force.x - speed, -maxHorizontalSpeed, 0);
-        else if (Input.GetKeyUp(KeyCode.D))
-            force.x = force.x > 0 ? 0 : force.x;
-        else if (Input.GetKeyUp(KeyCode.A))
-            force.x = force.x < 0 ? 0 : force.x;
+            force.x = Mathf.Clamp(force.x + speed * x, -maxHorizontalSpeed, maxHorizontalSpeed);
+        }
+        else if (Input.GetButtonUp("Horizontal"))
+            force.x = 0;
+
     }
     public void AddHorizontalForce(float _force) => force.x = Mathf.Clamp(force.x - _force, -maxHorizontalSpeed, maxHorizontalSpeed);
     public void AddVerticalForce(float _force) => force.y += _force;

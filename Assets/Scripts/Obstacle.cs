@@ -4,9 +4,9 @@ public abstract class Obstacle : MonoBehaviour
 {
     void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.CompareTag("Opponent"))
+        if (other.gameObject.TryGetComponent<Unit>(out var unit))
         {
-            other.gameObject.GetComponent<Unit>().RestartUnit();
+            unit.RestartUnit();
         }
     }
 }

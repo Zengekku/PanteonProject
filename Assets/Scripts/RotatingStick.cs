@@ -6,20 +6,19 @@ public class RotatingStick : MonoBehaviour
 {
     [SerializeField] float pushForce = 100;
 
-    private void OnCollisionEnter(Collision other)
+    void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.TryGetComponent<IRunner>(out var runner))
         {
-            PushUnitBack(other);
+            PushUnitBack(other.transform, runner);
         }
     }
 
-    private void PushUnitBack(Collision other)
+    void PushUnitBack(Transform other, IRunner runner)
     {
-        var runner = other.gameObject.GetComponent<IRunner>();
         runner.AddVerticalForce(-800);
         runner.AddForwardForce(-400);
-        var dir = other.transform.position;
+        var dir = other.position;
         dir.y = 0;
         dir.z = 0;
         runner.Push(dir.normalized * pushForce);
