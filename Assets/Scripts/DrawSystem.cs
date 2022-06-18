@@ -36,8 +36,9 @@ public class DrawSystem : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
-                if (Vector2.Distance(hit.point, previousMousePos) < 0.5f) return;
-                var pos = hit.point - transform.position-hit.point;
+                if (Vector2.Distance(hit.point, previousMousePos) < 0.25f) return;
+                var pos = hit.point - hit.transform.position;
+                Debug.Log(pos);
                 int x = -Mathf.FloorToInt(curve.Evaluate(pos.x));
                 int y = -Mathf.FloorToInt(curve.Evaluate(pos.y));
                 Color colors2;
@@ -58,6 +59,6 @@ public class DrawSystem : MonoBehaviour
                 baseMaterial.mainTexture = fakeTexture;
             }
             previousMousePos = hit.point;
-        }        
+        }
     }
 }

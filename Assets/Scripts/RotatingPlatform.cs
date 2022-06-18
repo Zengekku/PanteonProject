@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RotateZAxis : MonoBehaviour
+public class RotatingPlatform : MonoBehaviour
 {
     [SerializeField] float rotationSpeed = 50;
     [SerializeField] float forceToUnits = 10;
@@ -14,7 +14,14 @@ public class RotateZAxis : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            other.gameObject.GetComponent<EnemyAI>().GetEffected(Vector3.left * forceToUnits);
+            other.gameObject.GetComponent<IRunner>().AddHorizontalForce( forceToUnits);
+        }
+    }
+    private void OnCollisionExit(Collision other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            other.gameObject.GetComponent<IRunner>().ContinueMoving();
         }
     }
 }

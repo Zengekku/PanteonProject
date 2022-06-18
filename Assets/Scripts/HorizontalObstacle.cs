@@ -13,13 +13,12 @@ public class HorizontalObstacle : MonoBehaviour
     bool start;
     private IEnumerator Start()
     {
-        
         startPos = transform.position;
         length = groundMesh.bounds.size.x / 2;
         yield return new WaitForSeconds(Random.Range(1, 10));
         start = true;
     }
-    private void Update()
+    void Update()
     {
         if (!start) return;
         var currentPos = startPos;
@@ -27,18 +26,14 @@ public class HorizontalObstacle : MonoBehaviour
         time += Time.deltaTime;
         transform.position = currentPos;
     }
-    private void OnCollisionEnter(Collision other)
+    void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            //other.gameObject.GetComponent<EnemyAI>().StopForce();
-           // other.gameObject.GetComponent<Rigidbody>().AddForce((other.transform.position - other.contacts[0].point) * pushForce, ForceMode.VelocityChange);
+            var runner = other.gameObject.GetComponent<IRunner>();
+            runner.StopMoving();
+            runner.Push(Vector3.back * pushForce);
+            runner.ContinueMoving();
         }
-
-    }
-    private void OnCollisionExit(Collision other)
-    {
-        if (other.gameObject.CompareTag("Player"))
-            other.gameObject.GetComponent<EnemyAI>().Continue();
     }
 }

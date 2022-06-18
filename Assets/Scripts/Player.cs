@@ -2,58 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Unit, IRunner
 {
-    [SerializeField] Rigidbody rgb;
-    [SerializeField] float speed = 50f;
-    [SerializeField] float gravity = 100f;
-    [SerializeField] Vector3 force = Vector3.zero;
-    bool stop = false;
-    public void GetEffected(Vector3 dir)
+    void Update()
     {
-        force.x = Mathf.Clamp(force.x - dir.x, -300, 0);
-    }
-    private void Update()
-    {
-        if (stop) return;
+        if (stopped) return;
+
         if (Input.GetKey(KeyCode.D))
-            force.x = Mathf.Clamp(force.x + speed, 0, 400);
+            force.x = Mathf.Clamp(force.x + speed, 0, maxHorizontalSpeed);
         else if (Input.GetKey(KeyCode.A))
-            force.x = Mathf.Clamp(force.x - speed, -400, 0);
+            force.x = Mathf.Clamp(force.x - speed, -maxHorizontalSpeed, 0);
         else if (Input.GetKeyUp(KeyCode.D))
             force.x = force.x > 0 ? 0 : force.x;
         else if (Input.GetKeyUp(KeyCode.A))
             force.x = force.x < 0 ? 0 : force.x;
-
     }
-    public void StopForce()
+    void LateUpdate() => transform.rotation = Quaternion.Euler(Vector3.zero);
+    public void AddHorizontalForce(float _force) => force.x = Mathf.Clamp(force.x - _force, -maxHorizontalSpeed, maxHorizontalSpeed);
+    public void AddVerticalForce(float _force) => force.y += _force;
+    public void AddForwardForce(float _force) => force.z = Mathf.Clamp(force.z + _force, 0, maxForwardSpeed);
+    public void StopMoving()
     {
-        stop = true;
-        rgb.velocity = Vector3.zero;
-        force.y = -250f;
-
+        stopped = true;
+        rgb.velocity = Vector3.down * 25;
+        force.z *= 0.5f;
+        force.x = 0;
     }
-    public void Continue()
+    public void ContinueMoving() => stopped = false;
+    public void Push(Vector3 dir) => rgb.AddForce(dir, ForceMode.VelocityChange);
+    void OnTriggerEnter(Collider other)
     {
-        stop = false;
-        force.y = -gravity;
-    }
-    private void FixedUpdate()
-    {
-        rgb.velocity = force * Time.fixedDeltaTime;
-    }
-    private void LateUpdate()
-    {
-        transform.rotation = Quaternion.Euler(Vector3.zero);
-    }
-    private void OnCollisionExit(Collision other)
-    {
-        if (other.gameObject.CompareTag("RotatingPlatform"))
-            StopForce();
-    }
-    private void OnCollisionEnter(Collision other)
-    {
-        //if (other.gameObject.CompareTag("Ground"))
-        Continue();
+        if (other.CompareTag("Finish"))
+        {
+            GameManager.instance.PassedFinishLine();
+        }
     }
 }
