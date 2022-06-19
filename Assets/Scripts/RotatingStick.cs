@@ -10,18 +10,18 @@ public class RotatingStick : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent<IRunner>(out var runner))
         {
-            PushUnitBack(other.transform, runner);
+
+            PushUnitBack(other, runner);
         }
     }
 
-    void PushUnitBack(Transform other, IRunner runner)
+    void PushUnitBack(Collision other, IRunner runner)
     {
         runner.AddVerticalForce(-800);
-        runner.AddForwardForce(-400);
-        var dir = other.position;
+        var dir =  -other.transform.position;
         dir.y = 0;
         dir.z = 0;
-        runner.Push(dir.normalized * pushForce);
+        runner.Push(dir * pushForce);
     }
 }
 //(other.transform.position - other.contacts[0].point)

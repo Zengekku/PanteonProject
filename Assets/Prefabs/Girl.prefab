@@ -871,9 +871,9 @@ MonoBehaviour:
   maxHorizontalSpeed: 600
   maxForwardSpeed: 450
   force: {x: 0, y: -200, z: 200}
-  rayCount: 10
+  rayCount: 5
   rayAngle: 270
-  rayMaxDistance: 2.5
+  rayMaxDistance: 5
   layerMask:
     serializedVersion: 2
     m_Bits: 128

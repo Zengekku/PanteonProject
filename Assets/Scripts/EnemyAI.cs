@@ -7,7 +7,7 @@ public class EnemyAI : Unit, IRunner
     [SerializeField] float rayMaxDistance = 1f;
     [SerializeField] LayerMask layerMask;
     [SerializeField] MeshRenderer ground;
-
+    bool goInward;
     private void Start()
     {
         //if you want different AI
@@ -29,15 +29,17 @@ public class EnemyAI : Unit, IRunner
 #endif
 
             RaycastHit hit;
-            if (CheckObstacles(dir, out hit))
+            if (ObstacleFound(dir, out hit))
             {
                 hitCount++;
-                desiredDirection += -hit.transform.position.x;
+
+                desiredDirection -= hit.transform.position.x;
+
             }
         }
         if (hitCount == 0)//if no obstacles found align to middle
         {
-            if (transform.position.x < -2 || transform.position.x > 2)
+            if (goInward)
             {
                 desiredDirection = -transform.position.x;
             }
@@ -51,8 +53,6 @@ public class EnemyAI : Unit, IRunner
             desiredDirection = 1;
 
         SetDesiradeForce(desiredDirection);
-        //if (transform.position.x > 4.2 && force.x > 0 || transform.position.x < -4.2f && force.x < 0)
-        //force.x = -force.x; if you want border detection
     }
     public void AddHorizontalForce(float _force) => force.x = Mathf.Clamp(force.x - _force, -maxHorizontalSpeed, maxHorizontalSpeed);
     public void AddVerticalForce(float _force) => force.y += _force;
@@ -65,9 +65,16 @@ public class EnemyAI : Unit, IRunner
         force.x = 0;
     }
     public void ContinueMoving() => unitStopped = false;
-    public void Push(Vector3 dir) => rgb.AddForce(dir, ForceMode.VelocityChange);
+    public void Push(Vector3 dir)
+    {
+        pushForce = dir;
+        rgb.velocity = Vector3.zero;
+        force = Vector3.zero;
+        //rgb.AddForce(dir, ForceMode.VelocityChange);
+    }
+
     void SetDesiradeForce(float forceDir) => force.x = Mathf.Clamp(forceDir * speed + force.x, -maxHorizontalSpeed, maxHorizontalSpeed);
-    bool CheckObstacles(Vector3 dir, out RaycastHit hit) => Physics.Raycast(transform.position + Vector3.up, dir, out hit, rayMaxDistance, layerMask);
+    bool ObstacleFound(Vector3 dir, out RaycastHit hit) => Physics.Raycast(transform.position + Vector3.up, dir, out hit, rayMaxDistance, layerMask);
     Vector3 GetDirection(float distPerRay, int i)
     {
         float angle = transform.eulerAngles.y - rayAngle * 0.5f + distPerRay * i;
@@ -86,5 +93,12 @@ public class EnemyAI : Unit, IRunner
             GetComponent<Collider>().enabled = false;
             animator.Play("Cheer");
         }
+    }
+    private void OnCollisionStay(Collision other)
+    {
+        if (other.gameObject.CompareTag("RotatingPlatform"))
+            goInward = true;
+        else
+            goInward = false;
     }
 }

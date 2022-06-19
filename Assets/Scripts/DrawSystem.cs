@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -16,6 +14,7 @@ public class DrawSystem : MonoBehaviour
     int maxPaintedCount = 262144;
     [SerializeField] int paintedCount;
     [SerializeField] TextMeshPro paintedPercantage;
+    [SerializeField] GameObject restartButton;
 
     Vector2 previousMousePos;
 
@@ -80,6 +79,7 @@ public class DrawSystem : MonoBehaviour
         {
             effect.Play();
         }
+        restartButton.SetActive(true);
         enabled = false;
     }
 

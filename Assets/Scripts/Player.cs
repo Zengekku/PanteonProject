@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : Unit, IRunner
 {
+
     void Update()
     {
         if (unitStopped) return;
@@ -28,7 +29,14 @@ public class Player : Unit, IRunner
         force.x = 0;
     }
     public void ContinueMoving() => unitStopped = false;
-    public void Push(Vector3 dir) => rgb.AddForce(dir, ForceMode.VelocityChange);
+    public void Push(Vector3 dir)
+    {
+        pushForce = dir;
+        rgb.velocity = Vector3.zero;
+        force = Vector3.zero;
+        //rgb.AddForce(dir, ForceMode.VelocityChange);
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Finish"))

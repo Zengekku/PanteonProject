@@ -11,6 +11,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected Vector3 force = Vector3.zero;
     protected bool unitStopped = false;
     float startSpeed = 200;
+    protected Vector3 pushForce = Vector3.zero;
     void FixedUpdate()
     {
         if (BelowThreshold(-10))//game over
@@ -23,7 +24,7 @@ public abstract class Unit : MonoBehaviour
 
         SetVelocity();
 
-        if (BelowThreshold(-0.75f))//falling
+        if (BelowThreshold(-1.5f))//falling
             force.y = -800f;
         else
             force.y = -startSpeed;
@@ -37,6 +38,7 @@ public abstract class Unit : MonoBehaviour
         else
         {
             rgb.velocity = Vector3.zero;
+            pushForce=Vector3.zero;
             transform.position = GameManager.instance.StartPos;
             force.x = startSpeed;
         }
@@ -45,6 +47,10 @@ public abstract class Unit : MonoBehaviour
     {
         force.z = Mathf.Clamp(force.z + (speed * Time.fixedDeltaTime), 0, maxForwardSpeed);
         rgb.velocity = force * Time.fixedDeltaTime;
+        if (pushForce != Vector3.zero)
+            rgb.AddForce(pushForce, ForceMode.Impulse);
+        else
+            pushForce = Vector3.zero;
     }
     bool BelowThreshold(float y) => transform.position.y < y;
     void LateUpdate() => transform.rotation = Quaternion.Euler(Vector3.zero);
